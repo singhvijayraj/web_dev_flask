@@ -1,73 +1,52 @@
-from flask import Blueprint, request, render_template, redirect, url_for, flash
-from app import db
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask_login import login_required, logout_user, login_user, current_user
+from app.models.employee import Employee
 from app.models.notice import Notice
+from werkzeug.security import check_password_hash
+from app import db
 
-# Define blueprint
-employee_bp = Blueprint('employee', __name__, url_prefix='/employee')
+employee_bp = Blueprint("employee", __name__, template_folder="../templates")
 
-# Employee login route
-@employee_bp.route('/login', methods=['GET', 'POST'])
+@employee_bp.route("/employee/login", methods=["GET", "POST"])
 def employee_login():
-    """
-    Employee login page.
-    Currently uses hardcoded credentials for testing.
-    """
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
 
-        # TEMPORARY hardcoded credentials
-        if username == "employee" and password == "employee123":
-            flash("Login successful!", "success")
-            return redirect(url_for('employee.dashboard'))
-        else:
-            flash("Invalid username or password", "danger")
-
-    return render_template('employee/employeelogin.html')
+        user = Employee.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            return redirect(url_for("employee.employee_dashboard"))
+        flash("Invalid username or password")
+    return render_template("employee_login.html")
 
 
-# Dashboard: List all notices
-@employee_bp.route('/dashboard')
-def dashboard():
-    """
-    Employee dashboard showing all notices.
-    """
-    notices = Notice.query.order_by(Notice.date_created.desc()).all()
-    return render_template('employee_dashboard.html', notices=notices)
+@employee_bp.route("/employee/dashboard")
+@login_required
+def employee_dashboard():
+    notices = Notice.query.order_by(Notice.created_at.desc()).all()
+    return render_template("employee_dashboard.html", notices=notices)
 
 
-# Add a new notice
-@employee_bp.route('/add_notice', methods=['GET', 'POST'])
+@employee_bp.route("/employee/add_notice", methods=["GET", "POST"])
+@login_required
 def add_notice():
-    """
-    Add a new notice to the database.
-    """
-    if request.method == 'POST':
-        title = request.form.get('title')
-        content = request.form.get('content')
-
-        if not title or not content:
-            flash("Title and Content cannot be empty!", "danger")
-            return redirect(url_for('employee.add_notice'))
+    if request.method == "POST":
+        title = request.form["title"]
+        content = request.form["content"]
 
         new_notice = Notice(title=title, content=content)
         db.session.add(new_notice)
         db.session.commit()
-        flash("Notice added successfully!", "success")
-        return redirect(url_for('employee.dashboard'))
 
-    return render_template('add_notice.html')
+        flash("Notice added successfully")
+        return redirect(url_for("employee.employee_dashboard"))
+
+    return render_template("add_notice.html")
 
 
-# Delete a notice
-@employee_bp.route('/delete_notice/<int:notice_id>', methods=['POST'])
-def delete_notice(notice_id):
-    """
-    Delete a notice by ID.
-    """
-    notice = Notice.query.get_or_404(notice_id)
-    db.session.delete(notice)
-    db.session.commit()
-    flash("Notice deleted successfully!", "info")
-    return redirect(url_for('employee.dashboard'))
-
+@employee_bp.route("/employee/logout")
+@login_required
+def employee_logout():
+    logout_user()
+    return redirect(url_for("employee.employee_login"))

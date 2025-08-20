@@ -1,17 +1,15 @@
+# app/models/employee.py
+from app import db
 from flask_login import UserMixin
 
-# Dummy user database for now — later will use SQLite
-USERS = {
-    "admin": {"password": "admin123"}  # In production: use hashed passwords
-}
+class Employee(UserMixin, db.Model):
+    __tablename__ = "employees"
 
-class Employee(UserMixin):
-    def __init__(self, username):
-        self.id = username
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)  # hashed password recommended
 
-    @staticmethod
-    def validate_login(username, password):
-        user = USERS.get(username)
-        if user and user["password"] == password:
-            return Employee(username)
-        return None
+    def __repr__(self):
+        return f"<Employee {self.username}>"
+  # store hashed password
+

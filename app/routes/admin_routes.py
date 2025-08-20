@@ -26,3 +26,6 @@ def admin_login():
 def dashboard():
     return "<h1>Welcome Admin! You can manage notices and users here.</h1>"
 
+
+
+

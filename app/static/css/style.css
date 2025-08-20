@@ -1,9 +1,9 @@
 /* app/static/css/style.css */
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
+    background: url("https://images.ctfassets.net/hrltx12pl8hq/28ECAQiPJZ78hxatLTa7Ts/2f695d869736ae3b0de3e56ceaca3958/free-nature-images.jpg?fit=fill&w=1200&h=630") no-repeat center center fixed;
+    background-size: cover;
 }
+
 nav {
     background-color: #333;
     padding: 0.5rem;
