@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Add Notice{% endblock %}
+
+{% block content %}
+<h1>Add New Notice</h1>
+
+<form method="POST">
+    <label for="title">Title:</label><br>
+    <input type="text" id="title" name="title" required><br><br>
+
+    <label for="content">Content:</label><br>
+    <textarea id="content" name="content" rows="5" cols="50" required></textarea><br><br>
+
+    <button type="submit">Add Notice</button>
+</form>
+
+<p><a href="{{ url_for('employee.dashboard') }}">Back to Dashboard</a></p>
+{% endblock %}

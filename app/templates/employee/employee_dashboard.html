@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Employee Dashboard{% endblock %}
+
+{% block content %}
+<h1>Employee Dashboard</h1>
+
+<!-- Link to add a new notice -->
+<p><a href="{{ url_for('employee.add_notice') }}">Add New Notice</a></p>
+
+<!-- List all notices -->
+<table border="1" cellpadding="5">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Content</th>
+            <th>Date Created</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for notice in notices %}
+        <tr>
+            <td>{{ notice.id }}</td>
+            <td>{{ notice.title }}</td>
+            <td>{{ notice.content }}</td>
+            <td>{{ notice.date_created.strftime("%Y-%m-%d %H:%M") }}</td>
+            <td>
+                <!-- Delete button -->
+                <form action="{{ url_for('employee.delete_notice', notice_id=notice.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" onclick="return confirm('Are you sure to delete this notice?')">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="5">No notices available.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
